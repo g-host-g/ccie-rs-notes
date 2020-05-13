@@ -96,6 +96,20 @@ int vlan 100
 * Technically SNAP-encap frame
 
 **802.1q**
+* Frame structure
+  * Size - 32-bit
+    * Tag protocol identifier (TPID): 16-bit is filed set to 0x8100 to identify the packet as an 802.1Q
+    * Priority code point (PCP): This 3-bit filed indicates a class of service (CoS) as part of Layer 2 QoS between switches
+    * Drop Eligible Indicator (DEI): This 1-bit field indicates whether the packet can be droped when there is bandwidth contention.
+    * VLAN identifier (VID): This 12-bit filed specify the VLAN associated with network packet
+
+Vlan number | description
+- | -
+0 | reserved for 802.1P traffic
+1 | is default
+2 - 1001 | normal range
+1002 - 1005 | reserved
+1006-3967 and 4048-4093 | extended range
 
 * IEEE defined
 * Tags frame
