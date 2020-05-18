@@ -164,7 +164,7 @@ Consist of: -
 
 Use delay as bandwidth can have other effects, also says amount EIGRP can use on interface.
 
-# Packet FOrmat
+# Packet Format
 
 * IP PAckets, proto 88
 * MTU based length

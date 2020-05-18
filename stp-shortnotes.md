@@ -6,6 +6,9 @@
 * 802.1D-2004 now only RSTP
 * 802.1s integrated into 802.1Q-2005
 
+Two types BPDU:
+* Configuration BPDU
+* TCN BPDU
 ![STP BPDU](https://raw.githubusercontent.com/stuh84/ccie-rs-notes/master/images/stp-bpdu.png)
 
 STP  
@@ -60,11 +63,11 @@ Least path cost to root. RPC on received port added to BPDU.
 
 Port costs: -
 
-Standard | 10M | 100M | 1G | 10G
----------|-----|------|----|----
-Pre-802.1D-1998 |100|10|1|1|
-802.1D-1998|100|19|4|2|
-802.1D-2004|2000000|200000|20000|2000
+Standard | 10M | 100M | 1G | 10G | 20G | 100G | 1Tbps | 10Tbps |
+---------|-----|------|----|-----|-----|------|------|---------|
+Pre-802.1D-1998 |100|10|1|1|1|1|1|1|
+802.1D-1998|100|19|4|2|1|1|1|1|
+802.1D-2004|2000000|200000|20000|2000|1000|200|20|2|
 
 1998 default on most CAT switches. 2004 for MST by default. Change with **spanning-tree pathcost method long**
 
@@ -174,14 +177,14 @@ IEEE 802.1w
 
 Discarding, Learning and Forwarding only. Can be Discarding or Forwarding unlimited time, learning transitions.
 
-Discarding - No forwarding or MAC learning, processes rx BPDUs, sends BPDUs, tx/rx switch protocls (LLDP, VTP etc)
+Discarding - No forwarding or MAC learning, processes rx BPDUs, sends BPDUs, tx/rx switch protocols (LLDP, VTP etc)
 
 Four port roles: -
 
 * RP - As before
 * DP - As Before
 * Alternate - Replacement of root
-* Backup - replacement of DP
+* Backup - Replacement of DP
 
 RP and DP can be in Disc or Learn states, or skipped with proposal agreement
 
@@ -265,7 +268,6 @@ Non-edge port going from non-forwarding to forwarding is TC event. Loss of forwa
 * spanning-tree portfast or spanning-tree portfast default
 * Non p2p switches revert to 802.1D or PVST to legacy switches
 
-
 # MST: IEEE 802.1s
 
 * Tune STP parameters per instance
@@ -284,6 +286,7 @@ All switches in region configed with same VLAN mappings, same instances etc
 * IST is Instance 0
 * All VLANs default to IST
 * IST interacts outside MST region
+* IST operates across all links in the MST region, regardless of the VLAN assigned to the actual port
 * All VLANs must inherit port state of IST on region boundary
 * MST region seen as single switch outside it (CST blocks loops between regions)
 * ISTs on region boundaries constitute an SPT between regions of links only on boundaries
@@ -315,13 +318,13 @@ PVST Simulation - Same info for all instances despite interop only between one i
 
 MST --> PVST+ - IST info replicated to PVST BPDUs on all active VLANs
 
-PVST+ --> MST - MST takes VLAN 1 instance for entire region, processes info in IST. 
+PVST+ --> MST - MST takes VLAN 1 instance for entire region, processes info in IST.
 
 MST Boundary becomes RP if BPDUs superior to boundary ports own BPDUs, but best VLAN 1 PVST+ BPDUs on Boundary. Implies CIST root located in PVST+ region and VLAN 1 root. All VLANs in forwarding. PVST+ BPDUs coming in verified to see if identical or superior to those in VLAN 1
 
 If sys ID extension in PVST+, PVST BPDUs per VLAN cannot be identical (as VLAN part of it). So switches not in VLAN 1 must be lower by at least 4096 of PVST+ VLAN 1 root priotity.
 
-If not met, PVST simulation consistency, port blocking. 
+If not met, PVST simulation consistency, port blocking.
 
 MST boundary becomes non-DP if incoming VLAN 1 PVST+ BPDU superior, but not enough to be root. Must monitor all PVST+ BPDUs. Cisco optimisation says if true, port blocked according to Non-designated role. If not met, PVST simulation declared and port kept blocked.
 
@@ -461,6 +464,17 @@ Info in RSTP and MST BPDUs (role and state of port)
 
 # Configuring and Troubleshooting Etherchannels
 
+MUST mach:
+* Port type
+* Port mode
+* Native VLAN
+* Allowed VLAN
+* Speed
+* Duplex
+* MTU
+* Load interval
+* Storm control
+
 * PortChannels
 * STP sees as one link
 * Bandwidth only parameter changed on link failure
@@ -515,12 +529,16 @@ Etherchannel Misconfig Guard - BPDUs should be rx'd over etherchannel with same 
 802.1AX (formerly 802.3ad) LACP or PAgP
 
 **PAgP**
-* Max 8 links, no more in PC, ca only change timers (normal: 30s, fast: 1s)
-* **channel-group 1 mode auto/desirable**
+* multicast MAC address 0100:0CCC:CCCC
+* protocol code 0x0104
+* Max 8 links, no more in PC, can only change timers (normal: 30s, fast: 1s)
+* **channel-group 1 mode auto/desirable [non-silent]**
 
 **LACP**
+* multicast MAC address 0180:C200:0002
 * Max 16 links
 * 8 active, rest in Hot Standby
+* Timers (unusable after three intervals): slow: 30s, fast: 1s 
 * One switch in charged of standby, lowest LACP system ID, set with **lacp system-priority**,
 * If multiple standby links, switch in control chooses with lowest port ID< change with **lacp port-priority**, 0-65535
 * **channel-group 1 mode active/passive**
@@ -587,6 +605,3 @@ Helper commands limit to LACP or PAgP commands **channel-protocol pagp/lacp**
 **show spanning-tree inconsistent ports**
 
 **show spanning-tree [ vlan number ] root [ detail | priority [ system-id ] ]**
-
-
-

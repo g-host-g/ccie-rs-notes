@@ -180,7 +180,7 @@ int Fa0/1
 
 show int fa0/1 then shows admin and operational mode of tunnel
 
-# VLAN Trunking Protocol
+# VTP (VLAN Trunking Protocol)
 
 * Advertises VLAN ID, name, VLAN type and state
 * Three versions, v1 and v2 on IOS and CatOS, v3 on IOS from 12.2(52)SE
@@ -205,10 +205,10 @@ v3 additions
 
 v1 and v2 use four message types
 
-* Summary advertisement - From all switches, every 5 mins and after db mod, VTP domain name, revision number, identity of updater, time stamp of update, md5 sum over VLAN DB contents and VTP password, and number of subsets to follow
-* Subset advertisement - Originated by db modifier, carries full VLAN db contents. One advertisement holds multiple VLAN db entries, may need multiple subset messages
-* Advertisement request - To request complete vlan db or part, sent after advertisement, or whe receiving summary with higher rev number
-* Join - Sent every 6 seconds if VTP pruning active, contains bitfield for each VLAN in normal range, and used/unused
+* **Summary advertisement** - From all switches, every 5 mins and after db mod, VTP domain name, revision number, identity of updater, time stamp of update, md5 sum over VLAN DB contents and VTP password, and number of subsets to follow
+* **Subset advertisement** - Originated by db modifier, carries full VLAN db contents. One advertisement holds multiple VLAN db entries, may need multiple subset messages
+* **Advertisement request** - To request complete vlan db or part, sent after advertisement, or whe receiving summary with higher rev number
+* **Join** - Sent every 6 seconds if VTP pruning active, contains bitfield for each VLAN in normal range, and used/unused
 
 VTP messages only on trunks
 
